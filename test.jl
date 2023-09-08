@@ -1,6 +1,6 @@
 using Revise, ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
-elements,nodes,elms_p = import_tri3("./msh/cantilever_2.msh","./msh/cantilever_2.msh")
+elements,elms_p = import_tri3("./msh/cantilever_2.msh","./msh/cantilever_2.msh")
 
 # nₚ = length(nodes)
 
