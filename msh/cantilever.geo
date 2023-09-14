@@ -20,8 +20,8 @@ Plane Surface(1) = {1};
 
 Transfinite Curve{1,2,3,4} = n+1;
 
-Physical Curve("Γᵗ") = {2};
-Physical Curve("Γᵍ") = {4};
+Physical Curve("Γᵗ") = {3};
+Physical Curve("Γᵍ") = {1};
 Physical Surface("Ω") = {1};
 
 Transfinite Surface{1};
@@ -29,4 +29,4 @@ Transfinite Surface{1};
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-RecombineMesh;
+//RecombineMesh;
