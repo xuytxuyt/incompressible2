@@ -119,9 +119,23 @@ function import_fem_tri3(filename1::String,filename2::String)
     if haskey(elms,"Γᵗ")
         f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
         elements["Γᵗ"] = f_Γᵗ(elms["Γᵗ"])
+        n₁ = zeros(length(elms["Γᵗ"]))
+        n₂ = zeros(length(elms["Γᵗ"]))
         push!(f_Γᵗ,
             :𝝭=>:𝑠,
+            :n₁=>(:𝐶,n₁),
+            :n₂=>(:𝐶,n₂),
         )
+        for ap in elements["Γᵗ"]
+            nd₁,nd₂ = ap.𝓒
+            x₁ = nd₁.x
+            x₂ = nd₂.x
+            y₁ = nd₁.y
+            y₂ = nd₂.y
+            𝐿 = ((x₁-x₂)^2+(y₁-y₂)^2)^0.5
+            ap.n₁ = (y₂-y₁)/𝐿
+            ap.n₂ = (x₁-x₂)/𝐿
+        end
     end
     return elements, nodes, nodes_p
 end
