@@ -45,9 +45,9 @@ ops = [
 k = zeros(2*nₚ,2*nₚ)
 f = zeros(2*nₚ)
 
-ops[1].(elements["Ω"];k=k)
-ops[2].(elements["Γᵍ"];k=k,f=f)
-ops[3].(elements["Γᵗ"];f=f)
+ops[1](elements["Ω"],k)
+ops[2](elements["Γᵍ"],k,f)
+ops[3](elements["Γᵗ"],f)
 
 d = k\f
 d₁ = d[1:2:2*nₚ]
