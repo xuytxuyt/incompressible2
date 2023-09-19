@@ -31,8 +31,8 @@ ApproxOperator.prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
-ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->1.0)
+ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->2E/(1-0.3^2))
+ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->2E/(1-0.3^2))
 
 ops = [
     Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
@@ -47,7 +47,7 @@ f = zeros(2*nₚ)
 
 ops[1].(elements["Ω"];k=k)
 ops[2].(elements["Γᵍ"];k=k,f=f)
-# ops[3].(elements["Γᵗ"];f=f)
+ops[3].(elements["Γᵗ"];f=f)
 
 d = k\f
 d₁ = d[1:2:2*nₚ]
