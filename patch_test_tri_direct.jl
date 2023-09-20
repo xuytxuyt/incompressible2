@@ -20,11 +20,6 @@ v(x,y) = x+y
 ∂v∂x(x,y) = 1.0
 ∂v∂y(x,y) = 1.0
 
-ApproxOperator.prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->u(x,y))
-ApproxOperator.prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->v(x,y))
-ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
-ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
 ApproxOperator.prescribe!(elements["Ω"],:u=>(x,y,z)->u(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:v=>(x,y,z)->v(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
@@ -55,9 +50,9 @@ k = zeros(2*nₚ,2*nₚ)
 f = zeros(2*nₚ)
 
 ops[1](elements["Ω"],k)
+ops[3](elements["Γᵗ"],f)
 ops[4].(elements["Γᵍ"],k=k,f=f,dof=:d₁)
 ops[4].(elements["Γᵍ"],k=k,f=f,dof=:d₂)
-ops[3](elements["Γᵗ"],f)
 
 d = k\f
 d₁ = d[1:2:2*nₚ]

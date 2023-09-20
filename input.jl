@@ -206,6 +206,7 @@ function import_fem_tri3_direct(filename1::String,filename2::String)
     #     :𝝭=>:𝑠,
     # )
 
+    elements["Γᵍ"] = Element{:Poi1}[]
     𝓒 = Node{(:𝐼,),1}[]
     𝓖 = Node{(:𝑔,:𝐺,:𝐶,:𝑠),4}[]
     c = 0
@@ -213,15 +214,13 @@ function import_fem_tri3_direct(filename1::String,filename2::String)
 
     for (C,a) in enumerate(elms["Γᵍ"])
         element = Element{:Poi1}((c,1,𝓒),(0,0,𝓖))
-        v = a.vertices[1]
-        i = v.i
-        push!(𝓒,nodes[i])
+        push!(𝓒,nodes[a.i[1]])
+        push!(elements["Γᵍ"],element)
         c += 1
         if C == nₑ
             element = Element{:Poi1}((c,1,𝓒),(0,0,𝓖))
-            v = a.vertices[2]
-            i = v.i
-            push!(𝓒,nodes[i])    
+            push!(𝓒,nodes[a.i[2]])    
+            push!(elements["Γᵍ"],element)
         end
     end
     if haskey(elms,"Γᵗ")
