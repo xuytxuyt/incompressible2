@@ -38,7 +38,7 @@ ops = [
     Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>E,:ν=>ν),
     Operator{:∫vᵢgᵢds}(:α=>1e13*E),
     Operator{:∫vᵢtᵢds}(),
-    Operator{:g}(),
+    Operator{:g₂}(),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
 ]
 
@@ -54,8 +54,8 @@ k = zeros(2*nₚ,2*nₚ)
 f = zeros(2*nₚ)
 
 ops[1](elements["Ω"],k)
-ops[2].(elements["Γᵍ"],k=k,f=f,dof=:d₁)
-ops[2].(elements["Γᵍ"],k=k,f=f,dof=:d₂)
+ops[4].(elements["Γᵍ"],k=k,f=f,dof=:d₁)
+ops[4].(elements["Γᵍ"],k=k,f=f,dof=:d₂)
 ops[3](elements["Γᵗ"],f)
 
 d = k\f
