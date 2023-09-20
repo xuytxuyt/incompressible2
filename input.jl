@@ -181,15 +181,14 @@ function import_fem_tri3_direct(filename1::String,filename2::String)
     𝗠 = zeros(n𝒑)
     ∂𝗠∂x = zeros(n𝒑)
     ∂𝗠∂y = zeros(n𝒑)
+
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
     f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Tri3},:TriGI3,data)
     f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Tri3},:TriGI13,data_p)
-    f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Poi1},:PoiGI1,data)
-
+    # f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Poi1},:PoiGI1,data)
     elements["Ω"] = f_Ω(elms["Ω"])
     elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"])
-    elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"])
     push!(f_Ω,
         :𝝭=>:𝑠,
         :∂𝝭∂x=>:𝑠,
@@ -203,10 +202,28 @@ function import_fem_tri3_direct(filename1::String,filename2::String)
         :∂𝗠∂x=>(:𝐶,∂𝗠∂x),
         :∂𝗠∂y=>(:𝐶,∂𝗠∂y)
     )
-    push!(f_Γᵍ,
-        :𝝭=>:𝑠,
-        
-    )
+    # push!(f_Γᵍ,
+    #     :𝝭=>:𝑠,
+    # )
+
+    𝓒 = Node{(:𝐼,),1}[]
+    𝓖 = Node{(:𝑔,:𝐺,:𝐶,:𝑠),4}[]
+    c = 0
+    nₑ = length(elms["Γᵍ"])
+
+    for (C,a) in enumerate(elms["Γᵍ"])
+        element = Element{:Poi1}((c,1,𝓒),(0,0,𝓖))
+        v = a.vertices[1]
+        i = v.i
+        push!(𝓒,nodes[i])
+        c += 1
+        if C == nₑ
+            element = Element{:Poi1}((c,1,𝓒),(0,0,𝓖))
+            v = a.vertices[2]
+            i = v.i
+            push!(𝓒,nodes[i])    
+        end
+    end
     if haskey(elms,"Γᵗ")
         f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
         elements["Γᵗ"] = f_Γᵗ(elms["Γᵗ"])
