@@ -2,7 +2,7 @@ using Revise, ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
 
 elements,nodes,nodes_p = import_fem_tri3_direct("./msh/cantilever_2.msh","./msh/cantilever_2.msh")
-# elements,nodes,nodes_p= import_quad("./msh/cantilever_quad_2.msh","./msh/cantilever_quad_2.msh")
+
 
 nₚ = length(nodes)
 

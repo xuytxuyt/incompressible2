@@ -1,12 +1,12 @@
 
 a = 10.0;
 b = 10.0;
-n = 2;
+n = 64;
 
-Point(1) = {0.0, 0.0, 0.0};
-Point(2) = {  a, 0.0, 0.0};
-Point(3) = {  a,  b, 0.0};
-Point(4) = {0.0,  b, 0.0};
+Point(1) = {-a/2, 0.0, 0.0};
+Point(2) = { a/2, 0.0, 0.0};
+Point(3) = { a/2,  b, 0.0};
+Point(4) = {-a/2,  b, 0.0};
 
 Line(1) = {1,2};
 Line(2) = {2,3};
@@ -29,4 +29,4 @@ Transfinite Surface{1};
 Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
-RecombineMesh;
+\\RecombineMesh;
