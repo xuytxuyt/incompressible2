@@ -1,10 +1,10 @@
 using Revise, ApproxOperator, LinearAlgebra, Printf, XLSX
-ndiv=8
+ndiv=64
 include("input.jl")
 
 # elements,nodes,nodes_p = import_fem_tri3_GI1("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
-elements,nodes,nodes_p = import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv)*".msh")
-
+# elements,nodes,nodes_p = import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv)*".msh")
+elements,nodes,nodes_p = import_quad8_GI1("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_quad8_"*string(ndiv)*".msh")
 
 nₚ = length(nodes)
 
