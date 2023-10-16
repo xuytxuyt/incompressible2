@@ -482,10 +482,10 @@ function import_quad8_GI1(filename1::String,filename2::String)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
 
-    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad8},:QuadGI4,data)
+    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad8},:QuadGI9,data)
     f_Ωᵛ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad8},:QuadGI1,data)
-    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad8},:QuadGI4,data_p)
-    f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg3},:SegGI2,data)
+    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad8},:QuadGI9,data_p)
+    f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg3},:SegGI3,data)
 
     elements["Ω"] = f_Ω(elms["Ω"])
     elements["Ωᵛ"] = f_Ωᵛ(elms["Ω"])
@@ -510,7 +510,7 @@ function import_quad8_GI1(filename1::String,filename2::String)
         :𝝭=>:𝑠,
     )
     if haskey(elms,"Γᵗ")
-        f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg3},:SegGI2,data)
+        f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg3},:SegGI3,data)
         elements["Γᵗ"] = f_Γᵗ(elms["Γᵗ"])
         n₁ = zeros(length(elms["Γᵗ"]))
         n₂ = zeros(length(elms["Γᵗ"]))
@@ -527,7 +527,7 @@ function import_quad8_GI1(filename1::String,filename2::String)
             y₂ = nd₂.y
             𝐿 = ((x₁-x₂)^2+(y₁-y₂)^2)^0.5
             ap.n₁ = (y₂-y₁)/𝐿
-             ap.n₂ = (x₁-x₂)/𝐿
+            ap.n₂ = (x₁-x₂)/𝐿
         end
     end
     return elements, nodes, nodes_p

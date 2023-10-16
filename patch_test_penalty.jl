@@ -3,7 +3,7 @@ include("input.jl")
 
 # elements,nodes,nodes_p = import_fem_tri3("./msh/cantile ver_2.msh","./msh/cantilever_2.msh")
 # elements,nodes,nodes_p= import_quad("./msh/cantilever_quad_2.msh","./msh/cantilever_quad_2.msh")
-elements,nodes,nodes_p = import_quad8_GI1("./msh/cantilever_quad8_8.msh","./msh/cantilever_quad8_8.msh")
+elements,nodes,nodes_p = import_quad8_GI1("./msh/cantilever_quad8_2.msh","./msh/cantilever_quad8_2.msh")
 
 nₚ = length(nodes)
 
