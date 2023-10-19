@@ -1,19 +1,23 @@
-using Revise, ApproxOperator, LinearAlgebra, Printf, XLSX
+using Revise, ApproxOperator, LinearAlgebra, Printf, TimerOutputs, SparseArrays
 ndiv=64
 include("input.jl")
 
-# elements,nodes,nodes_p = import_fem_tri3_GI1("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv)*".msh")
-# elements,nodes,nodes_p = import_quad_GI1("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv)*".msh")
-elements,nodes,nodes_p = import_quad8_GI1("./msh/cantilever_quad8_"*string(ndiv)*".msh","./msh/cantilever_quad8_"*string(ndiv)*".msh")
+elements,nodes,nodes_p = import_fem_tri3_GI1("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv)*".msh")
+# elements,nodes,nodes_p = import_quad_GI1("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv)*".msh")
+elements,nodes,nodes_p = import_quad8_GI1("./msh/square_quad8_"*string(ndiv)*".msh","./msh/square_quad8_"*string(ndiv)*".msh")
 
+const to = TimerOutput()
+# ps = MKLPardisoSolver()
+# set_matrixtype!(ps,2)
 nₚ = length(nodes)
 
+@timeit to "shape function" begin
 set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵛ"])
 set∇𝝭!(elements["Ωᵛ"])
 set𝝭!(elements["Γᵍ"])
-
+end
 P = 1000
  Ē = 3e6
 ν̄ = 0.49999
@@ -45,9 +49,14 @@ opsᵛ = [
 opsᵈ = [
     Operator{:∫∫εᵈᵢⱼσᵈᵢⱼdxdy}(:E=>Ē,:ν=>ν̄ )
 ]
+
+@timeit to "assembly matrix" begin
 kᵛ = zeros(2*nₚ,2*nₚ)
 kᵈ = zeros(2*nₚ,2*nₚ)
 kᵍ = zeros(2*nₚ,2*nₚ) 
+# kᵛ = spzeros(2*nₚ,2*nₚ)
+# kᵈ = spzeros(2*nₚ,2*nₚ)
+# kᵍ = spzeros(2*nₚ,2*nₚ)
 f = zeros(2*nₚ)
 
 
@@ -55,4 +64,10 @@ opsᵛ[1](elements["Ωᵛ"],kᵛ)
 # opsᵛ[1](elements["Ω"],kᵛ)
 opsᵈ[1](elements["Ω"],kᵈ)
 ops[3](elements["Γᵍ"],kᵍ,f)
+end
+
+@timeit to "eigen" begin
 v = eigvals(kᵛ,kᵈ+kᵍ)
+end
+
+show(to)
