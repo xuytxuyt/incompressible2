@@ -2,13 +2,12 @@ using Revise, ApproxOperator, LinearAlgebra, Printf, TimerOutputs, SparseArrays
 ndiv=64
 include("input.jl")
 
-elements,nodes,nodes_p = import_fem_tri3_GI1("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv)*".msh")
+# elements,nodes,nodes_p = import_fem_tri3_GI1("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv)*".msh")
 # elements,nodes,nodes_p = import_quad_GI1("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv)*".msh")
 elements,nodes,nodes_p = import_quad8_GI1("./msh/square_quad8_"*string(ndiv)*".msh","./msh/square_quad8_"*string(ndiv)*".msh")
 
 const to = TimerOutput()
-# ps = MKLPardisoSolver()
-# set_matrixtype!(ps,2)
+
 nₚ = length(nodes)
 
 @timeit to "shape function" begin
@@ -54,9 +53,6 @@ opsᵈ = [
 kᵛ = zeros(2*nₚ,2*nₚ)
 kᵈ = zeros(2*nₚ,2*nₚ)
 kᵍ = zeros(2*nₚ,2*nₚ) 
-# kᵛ = spzeros(2*nₚ,2*nₚ)
-# kᵈ = spzeros(2*nₚ,2*nₚ)
-# kᵍ = spzeros(2*nₚ,2*nₚ)
 f = zeros(2*nₚ)
 
 

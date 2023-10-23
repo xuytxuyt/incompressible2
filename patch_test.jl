@@ -1,10 +1,7 @@
 using Revise, ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
 
-# elements,nodes,nodes_p = import_fem_tri3("./msh/square_2.msh","./msh/square_2.msh")
-# elements,nodes,nodes_p= import_quad("./msh/square_quad_2.msh","./msh/square_quad_2.msh")
-elements,nodes,nodes_p = import_quad8_GI1("./msh/square_quad8_2.msh","./msh/square_quad8_2.msh")
-
+elements,nodes,nodes_p = import_fem_tri3("./msh/square_2.msh","./msh/square_2.msh")
 nₚ = length(nodes)
 
 set𝝭!(elements["Ω"])
@@ -41,16 +38,21 @@ ops = [
     Operator{:∫vᵢtᵢds}(),
     Operator{:g}(),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
+    Operator{:∫∫p∇vdxdy}(),
 ]
 
 k = zeros(2*nₚ,2*nₚ)
-f = zeros(2*nₚ)
-
+kᵤ = zeros(2*nₚ,nₚ)
+f = zeros(3*nₚ)
+o = zeros(nₚ,nₚ)
 ops[1](elements["Ω"],k)
+ops[6](elements["Ω"],elements["Ω"],kᵤ)
 ops[2](elements["Γᵍ"],k,f)
 ops[3](elements["Γᵗ"],f)
 
-d = k\f
+kJ = hcat(vcat(k,kᵤ'),vcat(kᵤ,o))
+
+d = kJ\f
 d₁ = d[1:2:2*nₚ]
 d₂ = d[2:2:2*nₚ]
 
