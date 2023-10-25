@@ -30,9 +30,9 @@ function import_mf_tri3(filename1::String,filename2::String)
     f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Tri3},:TriGI13,data_p)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Seg2},:SegGI2,data)
 
-    elements["Ω"] = f_Ω(elms["Ω"])
-    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"])
-    elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"])
+    elements["Ω"] = f_Ω(elms["Ω"],sp)
+    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"],sp)
+    elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"],sp)
     push!(f_Ω,
         :𝝭=>:𝑠,
         :∂𝝭∂x=>:𝑠,
@@ -54,8 +54,8 @@ function import_mf_tri3(filename1::String,filename2::String)
         :𝗠=>(:𝐶,𝗠),
     )
     if haskey(elms,"Γᵗ")
-        f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Seg2},:SegGI2,data)
-        elements["Γᵗ"] = f_Γᵗ(elms["Γᵗ"])
+        f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Seg2},:SegGI5,data)
+        elements["Γᵗ"] = f_Γᵗ(elms["Γᵗ"],sp)
         n₁ = zeros(length(elms["Γᵗ"]))
         n₂ = zeros(length(elms["Γᵗ"]))
         push!(f_Γᵗ,
@@ -64,15 +64,14 @@ function import_mf_tri3(filename1::String,filename2::String)
              :n₂=>(:𝐶,n₂),     
              :𝗠=>(:𝐶,𝗠),
         )
-        for ap in elements["Γᵗ"]
-           nd₁,nd₂ = ap.𝓒
-            x₁ = nd₁.x
-            x₂ = nd₂.x
-            y₁ = nd₁.y
-            y₂ = nd₂.y
+        for (ap,a) in zip(elements["Γᵗ"],elms["Γᵗ"])
+            x₁ = a.x[a.i[1]]
+            x₂ = a.x[a.i[2]]
+            y₁ = a.y[a.i[1]]
+            y₂ = a.y[a.i[2]]
             𝐿 = ((x₁-x₂)^2+(y₁-y₂)^2)^0.5
-         ap.n₁ = (y₂-y₁)/𝐿
-         ap.n₂ = (x₁-x₂)/𝐿
+            ap.n₁ = (y₂-y₁)/𝐿
+            ap.n₂ = (x₁-x₂)/𝐿
         end
     end
 
