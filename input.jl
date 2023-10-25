@@ -62,7 +62,7 @@ function import_mf_tri3(filename1::String,filename2::String)
              :𝝭=>:𝑠,
              :n₁=>(:𝐶,n₁),
              :n₂=>(:𝐶,n₂),     
-              :𝗠=>(:𝐶,𝗠),
+             :𝗠=>(:𝐶,𝗠),
         )
         for ap in elements["Γᵗ"]
            nd₁,nd₂ = ap.𝓒
@@ -129,7 +129,6 @@ function import_fem_tri3(filename1::String,filename2::String)
     )
     push!(f_Γᵍ,
         :𝝭=>:𝑠,
-        
     )
     if haskey(elms,"Γᵗ")
         f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
