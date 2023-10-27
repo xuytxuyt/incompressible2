@@ -1,7 +1,7 @@
 using Revise, ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
 
-elements,nodes,nodes_p = import_fem_tri3("./msh/square_2.msh","./msh/square_2.msh")
+elements,nodes,nodes_p = import_fem_tri3("./msh/square_8.msh","./msh/square_8.msh")
 # elements,nodes,nodes_p= import_quad("./msh/square_quad_2.msh","./msh/square_quad_2.msh")
 
 nₚ = length(nodes)

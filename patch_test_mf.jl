@@ -1,13 +1,15 @@
 using Revise, ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
 
-elements,nodes,nodes_p = import_mf_tri3("./msh/square_8.msh","./msh/square_8.msh")
+# elements,nodes,nodes_p = import_mf_tri3("./msh/square_8.msh","./msh/square_8.msh")
+elements,nodes,nodes_p = import_fem_tri3("./msh/square_8.msh","./msh/square_8.msh")
 
 nₚ = length(nodes)
 
 s = 1.5*10/8*ones(nₚ)
 push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
+
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γᵍ"])
@@ -36,16 +38,8 @@ ApproxOperator.prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
-ApproxOperator.prescribe!(elements["Ωᵖ"],:u=>(x,y,z)->u(x,y))
-ApproxOperator.prescribe!(elements["Ωᵖ"],:v=>(x,y,z)->v(x,y))
-ApproxOperator.prescribe!(elements["Ωᵖ"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
-ApproxOperator.prescribe!(elements["Ωᵖ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
-ApproxOperator.prescribe!(elements["Ωᵖ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
-ApproxOperator.prescribe!(elements["Ωᵖ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
 # ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->E/(1-ν)*n₁+E/(1+ν)*n₂)
 # ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z,n₁,n₂)->E/(1+ν)*n₁+E/(1-ν)*n₂)
-# ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->Ē/(1+ν̄)/(1-2ν̄)*n₁+Ē/(1+ν̄)*n₂)
-# ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z,n₁,n₂)->Ē/(1+ν̄)*n₁+Ē/(1+ν̄)/(1-2ν̄)*n₂)
 ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->E/(1+ν)*n₁+E/(1+ν)*n₂)
 ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z,n₁,n₂)->E/(1+ν)*n₁-E/(1+ν)*n₂)
 # ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->E/(1+ν)/(1-2ν)*n₁+E/(1+ν)*n₂)
@@ -87,6 +81,5 @@ d₁ = d[1:2:2*nₚ]
 d₂ = d[2:2:2*nₚ]
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂)
-# push!(nodes_p,:d₁=>d₁,:d₂=>d₂)
 
 Hₑ_PlaneStress = ops[9](elements["Ω"])
