@@ -107,12 +107,12 @@ function import_fem_tri3(filename1::String,filename2::String)
     ∂𝗠∂y = zeros(n𝒑)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
-    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Tri3},:TriGI3,data)
+    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Tri3},:TriGI13,data)
     f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Tri3},:TriGI13,data_p)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
 
     elements["Ω"] = f_Ω(elms["Ω"])
-    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"],sp)
+    elements["Ωᵖ"] = f_Ωᵖ(elms["Ω"],sp)
     elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"])
     push!(f_Ω,
         :𝝭=>:𝑠,
