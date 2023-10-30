@@ -2,7 +2,7 @@ using Revise, ApproxOperator, LinearAlgebra, Printf, TimerOutputs, SparseArrays
 include("input.jl")
 
 ndiv= 20
-ndiv_p= 20
+ndiv_p= 10
 elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
 
 nₚ = length(nodes)
@@ -17,7 +17,7 @@ set𝝭!(elements["Ωᵖ"])
 set𝝭!(elements["Γᵍ"])
 
 P = 1000
- Ē = 3e6
+Ē = 3e6
 ν̄ = 0.49999
 # ν̄ = 0.3
 E = Ē/(1.0-ν̄^2)

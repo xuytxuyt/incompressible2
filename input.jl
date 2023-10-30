@@ -18,6 +18,7 @@ function import_mf_tri3(filename1::String,filename2::String)
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
     sp = ApproxOperator.RegularGrid(x,y,z,n=1,γ=2)
+    sp_p = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
     n𝒑 = 21
 
@@ -31,7 +32,7 @@ function import_mf_tri3(filename1::String,filename2::String)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Seg2},:SegGI5,data)
 
     elements["Ω"] = f_Ω(elms["Ω"],sp)
-    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"],sp)
+    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"],sp_p)
     elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"],sp)
     push!(f_Ω,
         :𝝭=>:𝑠,
@@ -96,7 +97,7 @@ function import_fem_tri3(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
-    sp = ApproxOperator.RegularGrid(x,y,z,n=1,γ=2)
+    sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
     n𝒑 = 21
 
@@ -171,7 +172,7 @@ function import_fem_tri3_GI1(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
-    sp = ApproxOperator.RegularGrid(x,y,z,n=1,γ=2)
+    sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
     n𝒑 = 21
 
@@ -253,7 +254,7 @@ function import_fem_tri3_direct(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
-    sp = ApproxOperator.RegularGrid(x,y,z,n=1,γ=2)
+    sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
     n𝒑 = 21
 

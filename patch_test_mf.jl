@@ -2,11 +2,12 @@ using Revise, ApproxOperator, LinearAlgebra, Printf
 include("input.jl")
 
 # elements,nodes,nodes_p = import_mf_tri3("./msh/square_8.msh","./msh/square_8.msh")
-elements,nodes,nodes_p = import_fem_tri3("./msh/square_8.msh","./msh/square_8.msh")
+elements,nodes,nodes_p = import_fem_tri3("./msh/square_16.msh","./msh/square_8.msh")
 
 nₚ = length(nodes)
+nᵤ = length(nodes)
 
-s = 1.5*10/8*ones(nₚ)
+s = 1.5*10/8*ones(nᵤ)
 push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 # push!(nodes,:s₁=>s,:s₂=>s,:s₃=>s)
 
