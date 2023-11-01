@@ -29,6 +29,8 @@ EI = E*I
 I = D^3/10
 EI = E*I
 
+prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
+prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->P/2/I*(D^2/4-y^2))
 prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->-P*y/6/EI*((6*L-3*x)*x + (2+ν)*(y^2-D^2/4)))
 prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
 prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
@@ -64,10 +66,10 @@ ops[2](elements["Ω"],elements["Ωᵖ"],kᵤ)
 ops[3](elements["Ω"],kₚ)
 ops[5](elements["Γᵍ"],kᵍ,f)
 
-# kp=[kₚ^-1 zeros(nₚ,nᵤ-nₚ);zeros(nᵤ-nₚ,nᵤ)]
-k=kᵤ*kₚ^-1*kᵤ'
-# k=kᵤ*kp*kᵤ'
+d = zeros(2*nₚ)
+d₁ = zeros(nₚ)
+d₂ = zeros(nₚ)
 
-a = eigvals(k,kᵈ+kᵍ)
+push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
 
