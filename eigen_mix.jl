@@ -65,7 +65,8 @@ ops[3](elements["Ω"],kₚ)
 ops[5](elements["Γᵍ"],kᵍ,f)
 
 # kp=[kₚ^-1 zeros(nₚ,nᵤ-nₚ);zeros(nᵤ-nₚ,nᵤ)]
-k=kᵤ*kₚ^-1*kᵤ'
+k=kᵤ*(kᵤ'\kₚ)
+k=kᵤ*inv(kₚ)*kᵤ'
 # k=kᵤ*kp*kᵤ'
 
 a = eigvals(k,kᵈ+kᵍ)
