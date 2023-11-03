@@ -2,13 +2,13 @@ using Revise, ApproxOperator, LinearAlgebra, Printf, TimerOutputs, SparseArrays
 include("input.jl")
 
 ndiv= 8
-ndiv_p= 4
+ndiv_p= 16
 elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
 
-nₚ = length(nodes)
-nᵤ = length(nodes_p)
+nᵤ = length(nodes)
+nₚ = length(nodes_p)
 
-s = 2.5*10/ndiv_p*ones(nᵤ)
+s = 2.5*10/ndiv_p*ones(nₚ)
 push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
 set𝝭!(elements["Ω"])
@@ -51,23 +51,21 @@ opsᵈ = [
 ]
 
 # kᵛ = zeros(2*nₚ,2*nₚ)
-kᵈ = zeros(2*nₚ,2*nₚ)
-kᵍ = zeros(2*nₚ,2*nₚ) 
-kᵤ = zeros(2*nₚ,nₚ)
-# kᵤ = zeros(2*nₚ,nᵤ)
-kₚ = zeros(nₚ,nₚ)
+kᵈ = zeros(2*nᵤ,2*nᵤ)
+kᵍ = zeros(2*nᵤ,2*nᵤ) 
+kᵤₚ = zeros(2*nᵤ,nₚ)
+kₚₚ = zeros(nₚ,nₚ)
 # kₚ = zeros(nᵤ,nᵤ)
-f = zeros(2*nₚ)
+f = zeros(2*nᵤ)
 
 opsᵈ[1](elements["Ω"],kᵈ)
-ops[2](elements["Ω"],elements["Ωᵖ"],kᵤ)
-ops[3](elements["Ω"],kₚ)
+ops[2](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+ops[3](elements["Ωᵖ"],kₚₚ)
 ops[5](elements["Γᵍ"],kᵍ,f)
 
-# kp=[kₚ^-1 zeros(nₚ,nᵤ-nₚ);zeros(nᵤ-nₚ,nᵤ)]
-k=kᵤ*(kᵤ'\kₚ)
-k=kᵤ*inv(kₚ)*kᵤ'
-# k=kᵤ*kp*kᵤ'
+
+# k=kᵤₚ*inv(kₚₚ)*kᵤₚ'
+k=kᵤₚ/kₚₚ*kᵤₚ'
 
 a = eigvals(k,kᵈ+kᵍ)
 

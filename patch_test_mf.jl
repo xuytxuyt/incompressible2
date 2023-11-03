@@ -18,16 +18,16 @@ set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
 
 E = 3e6
-# ν=0.3
-ν=0.49999999999999
+ν=0.3
+# ν=0.49999999999999
 Ē = E/(1-ν^2)
 ν̄ = ν/(1-ν)
 u(x,y) = x+y
-v(x,y) = x-y
+v(x,y) = x+y
 ∂u∂x(x,y) = 1.0
 ∂u∂y(x,y) = 1.0
 ∂v∂x(x,y) = 1.0
-∂v∂y(x,y) = -1.0
+∂v∂y(x,y) = 1.0
 
 ApproxOperator.prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->u(x,y))
 ApproxOperator.prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->v(x,y))
@@ -40,18 +40,8 @@ ApproxOperator.prescribe!(elements["Ω"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
 ApproxOperator.prescribe!(elements["Ω"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
-# ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->E/(1-ν)*n₁+E/(1+ν)*n₂)
-# ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z,n₁,n₂)->E/(1+ν)*n₁+E/(1-ν)*n₂)
-# ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->E/(1+ν)*n₁+E/(1+ν)*n₂)
-# ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z,n₁,n₂)->E/(1+ν)*n₁-E/(1+ν)*n₂)
 ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z,n₁,n₂)->E/(1+ν)/(1-2ν)*((1-ν)*∂u∂x(x,y) + ν*∂v∂y(x,y))*n₁+E/(1+ν)/2*(∂u∂y(x,y) + ∂v∂x(x,y))*n₂)
 ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z,n₁,n₂)->E/(1+ν)/2*(∂u∂y(x,y) + ∂v∂x(x,y))*n₁+E/(1+ν)/(1-2ν)*(ν*∂u∂x(x,y) + (1-ν)*∂v∂y(x,y))*n₂)
-
-ApproxOperator.prescribe!(elements["Γᵗ"],:g₁=>(x,y,z)->u(x,y))
-ApproxOperator.prescribe!(elements["Γᵗ"],:g₂=>(x,y,z)->v(x,y))
-ApproxOperator.prescribe!(elements["Γᵗ"],:n₁₁=>(x,y,z)->1.0)
-ApproxOperator.prescribe!(elements["Γᵗ"],:n₁₂=>(x,y,z)->0.0)
-ApproxOperator.prescribe!(elements["Γᵗ"],:n₂₂=>(x,y,z)->1.0)
 
 ops = [
     Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄),
@@ -78,8 +68,7 @@ ops[3](elements["Ω"],kᵤᵤ)
 ops[4](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
 ops[5](elements["Ωᵖ"],kₚₚ)
 ops[6](elements["Γᵍ"],kᵤᵤ,f)
-# ops[7](elements["Γᵗ"],f)
-ops[6](elements["Γᵗ"],kᵤᵤ,f)
+ops[7](elements["Γᵗ"],f)
 
 k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
 f = [f;zeros(nₚ)]
