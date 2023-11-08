@@ -19,8 +19,8 @@ for i in 2:50
     set𝝭!(elements["Γᵗ"])
 
     E = 3e6
-    # ν=0.3
-    ν=0.49999999999999
+    ν=0.3
+    # ν=0.49999999999999
     Ē = E/(1-ν^2)
     ν̄ = ν/(1-ν)
 
@@ -53,15 +53,15 @@ for i in 2:50
     ApproxOperator.prescribe!(elements["Ω"],:b₁=>(x,y,z)->-E/(1+ν)/(1-2ν)*((1-ν)*∂²u∂x²(x,y) + ν*∂²v∂x∂y(x,y)) - E/(1+ν)/2*(∂²u∂y²(x,y) + ∂²v∂x∂y(x,y)))
     ApproxOperator.prescribe!(elements["Ω"],:b₂=>(x,y,z)->-E/(1+ν)/2*(∂²u∂x∂y(x,y) + ∂²v∂x²(x,y)) - E/(1+ν)/(1-2ν)*(ν*∂²u∂x∂y(x,y) + (1-ν)*∂²v∂y²(x,y)))
 
+
     ops = [
            Operator{:∫∫εᵢⱼσᵢⱼdxdy}(:E=>Ē,:ν=>ν̄),
+           Operator{:∫∫vᵢbᵢdxdy}(),
            Operator{:∫∫p∇vdxdy}(),
            Operator{:∫∫qpdxdy}(:E=>E,:ν=>ν),
            Operator{:∫vᵢtᵢds}(),
            Operator{:∫vᵢgᵢds}(:α=>1e9*E),
-           Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
-           Operator{:∫∫vᵢbᵢdxdy}(),
-
+           Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄),
     ]
     opsᵛ = [
         Operator{:∫∫εᵛᵢⱼσᵛᵢⱼdxdy}(:E=>E,:ν=>ν )
@@ -78,13 +78,13 @@ for i in 2:50
     f = zeros(2*nᵤ)
 
     opsᵈ[1](elements["Ω"],kᵤᵤ)
-    # ops[2](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
-    ops[2](elements["Ω"],elements["Ω"],kᵤₚ)
-    # ops[3](elements["Ωᵖ"],kₚₚ)
-    ops[3](elements["Ω"],kₚₚ)
-    ops[5](elements["Γᵍ"],kᵤᵤ,f)
-    ops[4](elements["Γᵗ"],f)
-    ops[7](elements["Ω"],f)
+    ops[2](elements["Ω"],f)
+    # ops[3](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
+    ops[3](elements["Ω"],elements["Ω"],kᵤₚ)
+    # ops[4](elements["Ωᵖ"],kₚₚ)
+    ops[4](elements["Ω"],kₚₚ)  
+    ops[5](elements["Γᵗ"],f)
+    ops[6](elements["Γᵍ"],kᵤᵤ,f)
 
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
     # f = [f;zeros(nₚ)]
@@ -96,15 +96,14 @@ for i in 2:50
 
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
-
-    h1,l2 = ops[6](elements["Ω"])
+    h1,l2 = ops[7](elements["Ω"])
     L2 = log10(l2)
     H1 = log10(h1)
     h = i
 
     index = 2:50
     XLSX.openxlsx("./xlsx/mix.xlsx", mode="rw") do xf
-        Sheet = xf[8]
+        Sheet = xf[7]
         ind = findfirst(n->n==ndiv,index)+1
         Sheet["B"*string(ind)] = h
         Sheet["C"*string(ind)] = L2
