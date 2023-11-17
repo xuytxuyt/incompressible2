@@ -182,7 +182,7 @@ function import_fem_tri3_GI1(filename1::String,filename2::String)
     ∂𝗠∂y = zeros(n𝒑)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
-    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Tri3},:TriGI3,data)
+    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Tri3},:TriGI13,data)
     f_Ωᵛ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Tri3},:TriGI1,data)
     f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Tri3},:TriGI13,data_p)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
@@ -345,24 +345,41 @@ function import_quad(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
+    sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
+    parameters = (:Linear2D,:□,:CubicSpline)
+    n𝒑 = 21
+
+    𝗠 = zeros(n𝒑)
+    ∂𝗠∂x = zeros(n𝒑)
+    ∂𝗠∂y = zeros(n𝒑)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
     f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI4,data)
-    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI4,data_p)
+    f_Ωᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI16,data)
+    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Quad},:QuadGI4,data_p)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
 
     elements["Ω"] = f_Ω(elms["Ω"])
-    elements["Ωᵖ"] = f_Ωᵖ(elms["Ω"])
+    elements["Ωᵍ"] = f_Ωᵍ(elms["Ω"])
+    elements["Ωᵖ"] = f_Ωᵖ(elms["Ω"],sp)
     elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"])
     push!(f_Ω,
         :𝝭=>:𝑠,
         :∂𝝭∂x=>:𝑠,
         :∂𝝭∂y=>:𝑠,
-    )
+    ) 
+    push!(f_Ωᵍ,
+    :𝝭=>:𝑠,
+    :∂𝝭∂x=>:𝑠,
+    :∂𝝭∂y=>:𝑠,
+        )
     push!(f_Ωᵖ,
         :𝝭=>:𝑠,
         :∂𝝭∂x=>:𝑠,
         :∂𝝭∂y=>:𝑠,
+        :𝗠=>(:𝐶,𝗠),
+        :∂𝗠∂x=>(:𝐶,∂𝗠∂x),
+        :∂𝗠∂y=>(:𝐶,∂𝗠∂y)
     )
     push!(f_Γᵍ,
         :𝝭=>:𝑠,
@@ -385,7 +402,7 @@ function import_quad(filename1::String,filename2::String)
             y₂ = nd₂.y
             𝐿 = ((x₁-x₂)^2+(y₁-y₂)^2)^0.5
             ap.n₁ = (y₂-y₁)/𝐿
-             ap.n₂ = (x₁-x₂)/𝐿
+            ap.n₂ = (x₁-x₂)/𝐿
         end
     end
     return elements, nodes, nodes_p
@@ -408,16 +425,23 @@ function import_quad_GI1(filename1::String,filename2::String)
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
+    sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
+    parameters = (:Linear2D,:□,:CubicSpline)
+    n𝒑 = 21
+
+    𝗠 = zeros(n𝒑)
+    ∂𝗠∂x = zeros(n𝒑)
+    ∂𝗠∂y = zeros(n𝒑)
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
     f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI4,data)
     f_Ωᵛ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI1,data)
-    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI4,data_p)
+    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(ReproducingKernel{parameters...,:Quad},:QuadGI4,data_p)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
 
     elements["Ω"] = f_Ω(elms["Ω"])
     elements["Ωᵛ"] = f_Ωᵛ(elms["Ω"])
-    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"])
+    elements["Ωᵖ"] = f_Ωᵖ(elms_p["Ω"],sp)
     elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"])
     push!(f_Ω,
         :𝝭=>:𝑠,
@@ -432,7 +456,10 @@ function import_quad_GI1(filename1::String,filename2::String)
     push!(f_Ωᵖ,
         :𝝭=>:𝑠,
         :∂𝝭∂x=>:𝑠,
-        :∂𝝭∂y=>:𝑠,
+        :∂𝝭∂y=>:𝑠,        
+        :𝗠=>(:𝐶,𝗠),
+        :∂𝗠∂x=>(:𝐶,∂𝗠∂x),
+        :∂𝗠∂y=>(:𝐶,∂𝗠∂y)
     )
     push!(f_Γᵍ,
         :𝝭=>:𝑠,

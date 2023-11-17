@@ -1,21 +1,22 @@
 using Revise, ApproxOperator, LinearAlgebra, Printf, TimerOutputs, XLSX
 include("input.jl")
 
-for i in 40:60
-    ndiv= 50
-    ndiv_p= i
-    # elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_"*string(ndiv_p)*".msh")
-    # elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_"*string(ndiv_p)*".msh")
-    elements,nodes,nodes_p= import_quad("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
+# for i in 40:60
+    ndiv= 20
+    ndiv_p= 20
+    elements,nodes,nodes_p = import_fem_tri3("./msh/square_"*string(ndiv)*".msh","./msh/square_bubble.msh")
+    # elements,nodes,nodes_p= import_quad("./msh/square_quad_"*string(ndiv)*".msh","./msh/square_quad_"*string(ndiv_p)*".msh")
     
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
-    # s = 2.5*10/ndiv_p*ones(nₚ)
-    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+    s = 2.5*10/ndiv_p*ones(nₚ)
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])
+    # set𝝭!(elements["Ωᵍ"])
+    # set∇𝝭!(elements["Ωᵍ"])
     set𝝭!(elements["Ωᵖ"])
     set𝝭!(elements["Γᵍ"])
     set𝝭!(elements["Γᵗ"])
@@ -63,7 +64,7 @@ for i in 40:60
            Operator{:∫vᵢgᵢds}(:α=>1e9*E),
            Operator{:Hₑ_Incompressible}(:E=>Ē,:ν=>ν̄),
            Operator{:∫∫vᵢbᵢdxdy}(),
-
+           Operator{:Hₑ_PlaneStress}(:E=>Ē,:ν=>ν̄),
     ]
     opsᵛ = [
         Operator{:∫∫εᵛᵢⱼσᵛᵢⱼdxdy}(:E=>E,:ν=>ν )
@@ -73,24 +74,24 @@ for i in 40:60
     ]
 
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
-    # kᵤₚ = zeros(2*nᵤ,nₚ)
-    # kₚₚ = zeros(nₚ,nₚ)
-    kᵤₚ = zeros(2*nᵤ,nᵤ)
-    kₚₚ = zeros(nᵤ,nᵤ)
+    kᵤₚ = zeros(2*nᵤ,nₚ)
+    kₚₚ = zeros(nₚ,nₚ)
+    # kᵤₚ = zeros(2*nᵤ,nᵤ)
+    # kₚₚ = zeros(nᵤ,nᵤ)
     f = zeros(2*nᵤ)
 
     opsᵈ[1](elements["Ω"],kᵤᵤ)
     ops[2](elements["Ω"],elements["Ωᵖ"],kᵤₚ)
     # ops[2](elements["Ω"],elements["Ω"],kᵤₚ)
-    # ops[3](elements["Ωᵖ"],kₚₚ)
+    ops[3](elements["Ωᵖ"],kₚₚ)
     # ops[3](elements["Ω"],kₚₚ)
     ops[5](elements["Γᵍ"],kᵤᵤ,f)
     ops[4](elements["Γᵗ"],f)
     ops[7](elements["Ω"],f)
 
     k = [kᵤᵤ kᵤₚ;kᵤₚ' kₚₚ]
-    # f = [f;zeros(nₚ)]
-    f = [f;zeros(nᵤ)]
+    f = [f;zeros(nₚ)]
+    # f = [f;zeros(nᵤ)]
 
     d = k\f
     d₁ = d[1:2:2*nᵤ]
@@ -98,18 +99,24 @@ for i in 40:60
 
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
+    # ApproxOperator.prescribe!(elements["Ωᵍ"],:u=>(x,y,z)->u(x,y))
+    # ApproxOperator.prescribe!(elements["Ωᵍ"],:v=>(x,y,z)->v(x,y))
+    # ApproxOperator.prescribe!(elements["Ωᵍ"],:∂u∂x=>(x,y,z)->∂u∂x(x,y))
+    # ApproxOperator.prescribe!(elements["Ωᵍ"],:∂u∂y=>(x,y,z)->∂u∂y(x,y))
+    # ApproxOperator.prescribe!(elements["Ωᵍ"],:∂v∂x=>(x,y,z)->∂v∂x(x,y))
+    # ApproxOperator.prescribe!(elements["Ωᵍ"],:∂v∂y=>(x,y,z)->∂v∂y(x,y))
 
     h1,l2 = ops[6](elements["Ω"])
     L2 = log10(l2)
     H1 = log10(h1)
-    h = ndiv/ndiv_p
+    h = 2nᵤ/nₚ
 
-    index = 40:60
-    XLSX.openxlsx("./xlsx/mix.xlsx", mode="rw") do xf
-        Sheet = xf[3]
-        ind = findfirst(n->n==ndiv_p,index)+1
-        Sheet["F"*string(ind)] = h
-        Sheet["G"*string(ind)] = L2
-        Sheet["H"*string(ind)] = H1
-    end
-end
+#     index = 40:60
+#     XLSX.openxlsx("./xlsx/mix.xlsx", mode="rw") do xf
+#         Sheet = xf[3]
+#         ind = findfirst(n->n==ndiv_p,index)+1
+#         Sheet["B"*string(ind)] = h
+#         Sheet["C"*string(ind)] = L2
+#         Sheet["D"*string(ind)] = H1
+#     end
+# end

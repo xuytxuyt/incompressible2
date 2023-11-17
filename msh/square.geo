@@ -1,7 +1,7 @@
 
 a = 10.0;
 b = 10.0;
-n = 3;
+n = 20;
 
 Point(1) = {0.0, 0.0, 0.0};
 Point(2) = {  a, 0.0, 0.0};
@@ -30,5 +30,5 @@ Mesh.Algorithm = 8;
 Mesh.MshFileVersion = 2;
 Mesh 2;
 //Mesh.SecondOrderIncomplete = 1;
-RecombineMesh;
+//RecombineMesh;
 //SetOrder 2;
