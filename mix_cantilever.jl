@@ -3,11 +3,11 @@ using Revise, ApproxOperator, LinearAlgebra, Printf, XLSX
 
 include("input.jl")
 
-# for i in 10:30
+# for i in 1637:1649
     ndiv= 20
-    ndiv_p= 21
+    ndiv_p= 20
     # elements,nodes,nodes_p = import_quad("./msh/cantilever_quad_"*string(ndiv)*".msh","./msh/cantilever_quad_"*string(ndiv_p)*".msh")
-    elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_"*string(ndiv)*".msh","./msh/cantilever_bubble.msh")
+    elements,nodes,nodes_p = import_fem_tri3("./msh/cantilever_bubble_1701.msh","./msh/cantilever_bubble_1630.msh")
 
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
@@ -81,12 +81,12 @@ include("input.jl")
     h1,l2 = ops[8](elements["Ω"])
     L2 = log10(l2)
     H1 = log10(h1)
-    h = 2nᵤ/nₚ
+    # h = 2nᵤ/nₚ
 
-#     index = 10:30
+#     index = 1637:1649
 #     XLSX.openxlsx("./xlsx/mix.xlsx", mode="rw") do xf
-#         Sheet = xf[5]
-#         ind = findfirst(n->n==ndiv_p,index)+1
+#         Sheet = xf[6]
+#         ind = findfirst(n->n==i,index)+1
 #         Sheet["B"*string(ind)] = h
 #         Sheet["C"*string(ind)] = L2
 #         Sheet["D"*string(ind)] = H1
