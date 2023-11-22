@@ -27,6 +27,7 @@ hidedecorations!(ax)
 L = 48.
 b = 12.
 lines!([0.0,L,L,0.0,0.0],[-b/2,-b/2,b/2,b/2,-b/2], linewidth = lwb, color = :black)
+
 for elm in elms["Ω"]
     id = [i for i in elm.i]
     lines!(x[id[index]],y[id[index]], linewidth = lwm, color = :black)

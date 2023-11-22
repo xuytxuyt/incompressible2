@@ -1,3 +1,4 @@
+using Statistics
 
 function import_mf_tri3(filename1::String,filename2::String)
     elms,~= ApproxOperator.importmsh(filename1)
@@ -557,4 +558,21 @@ function import_quad8_GI1(filename1::String,filename2::String)
         end
     end
     return elements, nodes, nodes_p
+end
+
+function cal_area_support(elms::Vector{Tri3})
+    𝐴s = zeros(length(elms))
+    for (i,elm) in enumerate(elms)
+        x₁ = elm.x[elm.i[1]]
+        y₁ = elm.y[elm.i[1]]
+        x₂ = elm.x[elm.i[2]]
+        y₂ = elm.y[elm.i[2]]
+        x₃ = elm.x[elm.i[3]]
+        y₃ = elm.y[elm.i[3]]
+        𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
+    end
+    avg𝐴 = mean(𝐴s)
+    var𝐴 = var(𝐴s)
+    s = 4/3^0.5*avg𝐴
+    return s, var𝐴
 end
