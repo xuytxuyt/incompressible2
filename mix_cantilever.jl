@@ -12,8 +12,8 @@ include("input.jl")
     nᵤ = length(nodes)
     nₚ = length(nodes_p)
 
-    s = 2.5*10/ndiv_p*ones(nₚ)
-    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
+    # s = 1.5*12/ndiv_p*ones(nₚ)
+    # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     set𝝭!(elements["Ω"])
     set∇𝝭!(elements["Ω"])

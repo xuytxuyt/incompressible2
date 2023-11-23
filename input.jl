@@ -92,17 +92,31 @@ function import_fem_tri3(filename1::String,filename2::String)
     xᵖ = elms_p["Ω"][1].x
     yᵖ = elms_p["Ω"][1].y
     zᵖ = elms_p["Ω"][1].z
-   
+ 
     data = Dict([:x=>(1,x),:y=>(1,y),:z=>(1,z)])
     nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
+    𝐴s = zeros(length(elms_p))
+    for (i,elm_p) in enumerate(elms_p)
+        x₁ = elm_p.x[elm_p.i[1]]
+        y₁ = elm_p.y[elm_p.i[1]]
+        x₂ = elm_p.x[elm_p.i[2]]
+        y₂ = elm_p.y[elm_p.i[2]]
+        x₃ = elm_p.x[elm_p.i[3]]
+        y₃ = elm_p.y[elm_p.i[3]]
+        𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
+    end
+    avg𝐴 = mean(𝐴s)
+    var𝐴 = var(𝐴s)
+    s = 4/3^0.5*avg𝐴
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s,:var𝐴=>var𝐴)
+
     sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
     n𝒑 = 21
-
-
+    
     𝗠 = zeros(n𝒑)
     ∂𝗠∂x = zeros(n𝒑)
     ∂𝗠∂y = zeros(n𝒑)
@@ -560,19 +574,19 @@ function import_quad8_GI1(filename1::String,filename2::String)
     return elements, nodes, nodes_p
 end
 
-function cal_area_support(elms::Vector{Tri3})
-    𝐴s = zeros(length(elms))
-    for (i,elm) in enumerate(elms)
-        x₁ = elm.x[elm.i[1]]
-        y₁ = elm.y[elm.i[1]]
-        x₂ = elm.x[elm.i[2]]
-        y₂ = elm.y[elm.i[2]]
-        x₃ = elm.x[elm.i[3]]
-        y₃ = elm.y[elm.i[3]]
-        𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
-    end
-    avg𝐴 = mean(𝐴s)
-    var𝐴 = var(𝐴s)
-    s = 4/3^0.5*avg𝐴
-    return s, var𝐴
-end
+# function cal_area_support(elms::Vector{Tri3})
+#     𝐴s = zeros(length(elms))
+#     for (i,elm) in enumerate(elms)
+#         x₁ = elm.x[elm.i[1]]
+#         y₁ = elm.y[elm.i[1]]
+#         x₂ = elm.x[elm.i[2]]
+#         y₂ = elm.y[elm.i[2]]
+#         x₃ = elm.x[elm.i[3]]
+#         y₃ = elm.y[elm.i[3]]
+#         𝐴s[i] = 0.5*(x₁*y₂ + x₂*y₃ + x₃*y₁ - x₂*y₁ - x₃*y₂ - x₁*y₃)
+#     end
+#     avg𝐴 = mean(𝐴s)
+#     var𝐴 = var(𝐴s)
+#     s = 4/3^0.5*avg𝐴
+#     return s, var𝐴
+# end
