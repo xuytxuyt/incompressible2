@@ -92,11 +92,15 @@ function import_fem_tri3(filename1::String,filename2::String)
     xᵖ = elms_p["Ω"][1].x
     yᵖ = elms_p["Ω"][1].y
     zᵖ = elms_p["Ω"][1].z
-   
+ 
     data = Dict([:x=>(1,x),:y=>(1,y),:z=>(1,z)])
     nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
     data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
+
+    s, var𝐴 = cal_area_support(elms_p["Ω"])
+    s = 2.0*s*ones(nᵖ)
+    push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
     parameters = (:Linear2D,:□,:CubicSpline)
@@ -560,7 +564,7 @@ function import_quad8_GI1(filename1::String,filename2::String)
     return elements, nodes, nodes_p
 end
 
-function cal_area_support(elms::Vector{Tri3})
+function cal_area_support(elms::Vector{ApproxOperator.Tri3})
     𝐴s = zeros(length(elms))
     for (i,elm) in enumerate(elms)
         x₁ = elm.x[elm.i[1]]
