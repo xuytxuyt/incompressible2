@@ -13,6 +13,7 @@ include("input.jl")
     nₚ = length(nodes_p)
 
     # s = 1.5*12/ndiv_p*ones(nₚ)
+
     # push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     set𝝭!(elements["Ω"])
