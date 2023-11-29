@@ -1,4 +1,4 @@
-using Statistics
+using Statistics, DelimitedFiles
 
 function import_mf_tri3(filename1::String,filename2::String)
     elms,~= ApproxOperator.importmsh(filename1)
@@ -85,7 +85,6 @@ function import_fem_tri3(filename1::String,filename2::String)
     elms_p,~ = ApproxOperator.importmsh(filename2)
     nₚ = length(elms["Ω"][1].x)
     nᵖ = length(elms_p["Ω"][1].x)
-
     x = elms["Ω"][1].x
     y = elms["Ω"][1].y
     z = elms["Ω"][1].z
@@ -99,7 +98,11 @@ function import_fem_tri3(filename1::String,filename2::String)
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
     s, var𝐴 = cal_area_support(elms_p["Ω"])
-    s = 2.0*s*ones(nᵖ)
+    s = 1.5*s*ones(nᵖ)
+
+    f = open("./xlsx/var.txt", "a")
+    writedlm(f, [nᵖ var𝐴])
+    
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
