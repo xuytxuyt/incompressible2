@@ -27,8 +27,6 @@ include("input.jl")
     ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₁=>(x,y,z)->1.0)
     ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
     ApproxOperator.prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
-    ApproxOperator.prescribe!(elements["Γᵗ"],:t₁=>(x,y,z)->0.0)
-    ApproxOperator.prescribe!(elements["Γᵗ"],:t₂=>(x,y,z)->1.0)
 
     ops = [
            Operator{:∫κεγds}(:EI=>EI,:EA=>EA,:GA=>GA,:R=>R),
@@ -40,14 +38,15 @@ include("input.jl")
 
     k = zeros(3*nᵤ,3*nᵤ)
     f = zeros(3*nᵤ)
+    f[3*nᵤ-1] += 1.0
 
     ops[1](elements["Ω"],k)
-    ops[2](elements["Γᵗ"],f)
     ops[3](elements["Γᵍ"],k,f)
 
     d = k\f
-    d₁ = d[1:2:2*nᵤ]
-    d₂ = d[2:2:2*nᵤ]
+    d₁ = d[1:3:3*nᵤ]
+    d₂ = d[2:3:3*nᵤ]
+    d₃ = d[3:3:3*nᵤ]
 
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
 
