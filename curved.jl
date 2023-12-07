@@ -1,7 +1,7 @@
 using Revise, ApproxOperator, LinearAlgebra
 include("input.jl")
 
-ndiv= 50
+ndiv= 20
 ndiv_p= 1
 elements,nodes,nodes_p = import_fem_bar("./msh/bar_"*string(ndiv)*".msh","./msh/bar_"*string(ndiv_p)*".msh")
 nᵤ = length(nodes)
@@ -10,12 +10,16 @@ set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
 
+R = 1
+h = R/10
 E = 3e6
-EI = 3e6
-EA  = 3e6
-kGA  = EI/2*5/6
-R  = 1
-P  = 100
+I = π*h^4/64
+A = π*h^2/4
+EI = E*I
+EA = E*A
+kGA = EA/2*5/6
+P  = 1000
+
 ApproxOperator.prescribe!(elements["Γᵍ"],:g₁=>(x,y,z)->0.0)
 ApproxOperator.prescribe!(elements["Γᵍ"],:g₂=>(x,y,z)->0.0)
 ApproxOperator.prescribe!(elements["Γᵍ"],:g₃=>(x,y,z)->0.0)
@@ -49,7 +53,6 @@ push!(nodes,:d₁=>d₁,:d₂=>d₂,:d₃=>d₃)
 u = P*R^3/2/EI-P*R/2/kGA-P*R/2/EA
 v = π*P*R^3/4/EI+π*P*R/4/kGA+π*P*R/4/EA
 
-eᵇ = (d₁[2]^2/u^2)^0.5
-eˢ = (d₂[2]^2/v^2)^0.5
-eᵐ = (d₃[2]^2/θ^2)^0.5
-h = log10(1/ndiv)
+eᵇ = d₁[2]/u
+eˢ = d₂[2]/v
+eᵐ = d₃[2]/θ
