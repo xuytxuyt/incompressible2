@@ -1,4 +1,4 @@
-using Statistics
+using Statistics, DelimitedFiles
 
 function import_mf_tri3(filename1::String,filename2::String)
     elms,~= ApproxOperator.importmsh(filename1)
@@ -85,7 +85,6 @@ function import_fem_tri3(filename1::String,filename2::String)
     elms_p,~ = ApproxOperator.importmsh(filename2)
     nₚ = length(elms["Ω"][1].x)
     nᵖ = length(elms_p["Ω"][1].x)
-
     x = elms["Ω"][1].x
     y = elms["Ω"][1].y
     z = elms["Ω"][1].z
@@ -99,7 +98,11 @@ function import_fem_tri3(filename1::String,filename2::String)
     nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
     s, var𝐴 = cal_area_support(elms_p["Ω"])
-    s = 2.0*s*ones(nᵖ)
+    s = 1.5*s*ones(nᵖ)
+
+    f = open("./xlsx/var.txt", "a")
+    writedlm(f, [nᵖ var𝐴])
+    
     push!(nodes_p,:s₁=>s,:s₂=>s,:s₃=>s)
 
     sp = ApproxOperator.RegularGrid(xᵖ,yᵖ,zᵖ,n=1,γ=2)
@@ -560,6 +563,55 @@ function import_quad8_GI1(filename1::String,filename2::String)
             ap.n₁ = (y₂-y₁)/𝐿
             ap.n₂ = (x₁-x₂)/𝐿
         end
+    end
+    return elements, nodes, nodes_p
+end
+
+function import_fem_bar(filename1::String,filename2::String)
+    elms,~ = ApproxOperator.importmsh(filename1)
+    elms_p,~ = ApproxOperator.importmsh(filename2)
+    nₚ = length(elms["Ω"][1].x)
+    nᵖ = length(elms_p["Ω"][1].x)
+    x = elms["Ω"][1].x
+    y = elms["Ω"][1].y
+    z = elms["Ω"][1].z
+    xᵖ = elms_p["Ω"][1].x
+    yᵖ = elms_p["Ω"][1].y
+    zᵖ = elms_p["Ω"][1].z
+ 
+    data = Dict([:x=>(1,x),:y=>(1,y),:z=>(1,z)])
+    nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
+    data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
+    nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
+
+    elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
+
+    f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
+    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
+    f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Poi1},:PoiGI1,data)
+
+    elements["Ω"] = f_Ω(elms["Ω"])
+    elements["Ωᵖ"] = f_Ωᵖ(elms["Ω"])
+    elements["Γᵍ"] = f_Γᵍ(elms["Γᵍ"])
+    push!(f_Ω,
+        :𝝭=>:𝑠,
+        :∂𝝭∂x=>:𝑠,
+        :∂𝝭∂y=>:𝑠,
+    )
+    push!(f_Ωᵖ,
+        :𝝭=>:𝑠,
+        :∂𝝭∂x=>:𝑠,
+        :∂𝝭∂y=>:𝑠,
+    )
+    push!(f_Γᵍ,
+        :𝝭=>:𝑠,
+    )
+    if haskey(elms,"Γᵗ")
+        f_Γᵗ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Poi1},:PoiGI1,data)
+        elements["Γᵗ"] = f_Γᵗ(elms["Γᵗ"])
+        push!(f_Γᵗ,
+            :𝝭=>:𝑠,
+        )
     end
     return elements, nodes, nodes_p
 end
