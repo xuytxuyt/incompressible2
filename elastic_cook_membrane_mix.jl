@@ -69,9 +69,10 @@ ops = [
     f = [f;zeros(nₚ)]
 
     d = k\f
+    # q = -inv(kₚₚ)*kᵤₚ'*d
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
-    push!(nodes,:d₁=>d₁,:d₂=>d₂)
+    # push!(nodes,:d₁=>d₁,:d₂=>d₂,:q=>q)
 
 
 
