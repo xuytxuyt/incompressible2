@@ -1,7 +1,7 @@
-using Revise, ApproxOperator, LinearAlgebra
+using Revise, ApproxOperator, LinearAlgebra, XLSX
 include("input.jl")
 
-ndiv= 20
+ndiv= 100
 ndiv_p= 1
 elements,nodes,nodes_p = import_fem_bar("./msh/bar_"*string(ndiv)*".msh","./msh/bar_"*string(ndiv_p)*".msh")
 nᵤ = length(nodes)
@@ -9,12 +9,12 @@ set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
-
+i=1/10
 R = 1
-h = R/10
+h = R*i
 E = 3e6
-I = π*h^4/64
-A = π*h^2/4
+I = h^3/12
+A = h
 EI = E*I
 EA = E*A
 kGA = EA/2*5/6
@@ -56,3 +56,15 @@ v = π*P*R^3/4/EI+π*P*R/4/kGA+π*P*R/4/EA
 eᵇ = d₁[2]/u
 eˢ = d₂[2]/v
 eᵐ = d₃[2]/θ
+
+index = 100
+XLSX.openxlsx("./xlsx/curved.xlsx", mode="rw") do xf
+    Sheet = xf[2]
+    ind = findfirst(n->n==ndiv,index)+8
+    Sheet["A"*string(ind)] = i
+    Sheet["B"*string(ind)] = eᵇ
+    Sheet["C"*string(ind)] = eˢ
+    Sheet["D"*string(ind)] = eᵐ
+end
+
+θᶠ/θᶜ

@@ -71,7 +71,10 @@ include("input.jl")
     d = k\f
     d₁ = d[1:2:2*nᵤ]
     d₂ = d[2:2:2*nᵤ]
+    q  = d[2*nᵤ+1:end]
     push!(nodes,:d₁=>d₁,:d₂=>d₂)
+    push!(nodes_p,:q=>q)
+
 
     ApproxOperator.prescribe!(elements["Ω"],:u=>(x,y,z)->-P*y/6/EI*((6*L-3x)*x + (2+ν)*(y^2-D^2/4)))
     ApproxOperator.prescribe!(elements["Ω"],:v=>(x,y,z)->P/6/EI*(3*ν*y^2*(L-x) + (4+5*ν)*D^2*x/4 + (3*L-x)*x^2))
@@ -80,7 +83,8 @@ include("input.jl")
     ApproxOperator.prescribe!(elements["Ω"],:∂v∂x=>(x,y,z)->P/6/EI*((6*L-3*x)*x - 3*ν*y^2 + (4+5*ν)*D^2/4))
     ApproxOperator.prescribe!(elements["Ω"],:∂v∂y=>(x,y,z)->P/EI*(L-x)*y*ν)
 
-    h1,l2 = ops[8](elements["Ω"])
+    h1,l2 = ops[10](elements["Ω"],elements["Ωᵖ"])
+    # h1,l2 = ops[8](elements["Ω"])
     L2 = log10(l2)
     H1 = log10(h1)
     h = 2nᵤ/nₚ
