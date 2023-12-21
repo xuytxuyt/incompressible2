@@ -1,12 +1,24 @@
 using Revise, ApproxOperator, LinearAlgebra, XLSX
 include("input.jl")
 
-ndiv= 100
-ndiv_p= 1
-elements,nodes,nodes_p = import_fem_bar("./msh/bar_"*string(ndiv)*".msh","./msh/bar_"*string(ndiv_p)*".msh")
-nᵤ = length(nodes)
+ndiv= 30
+ndiv_n= 30
+ndiv_v= 30
+elements,nodes,nodes_n,nodes_v = import_fem_bar("./msh/bar_"*string(ndiv)*".msh","./msh/bar_"*string(ndiv_n)*".msh","./msh/bar_"*string(ndiv_v)*".msh")
+nₖ = length(nodes)
+nₙ = length(nodes_n)
+nᵥ = length(nodes_v)
+
+sₙ = 1.5/ndiv_n*ones(nₙ)
+sᵥ = 1.5/ndiv_v*ones(nᵥ)
+
+push!(nodes_n,:s₁=>sₙ,:s₂=>sₙ,:s₃=>sₙ)
+push!(nodes_v,:s₁=>sᵥ,:s₂=>sᵥ,:s₃=>sᵥ)
+
 set𝝭!(elements["Ω"])
 set∇𝝭!(elements["Ω"])
+set𝝭!(elements["Ωⁿ"])
+set𝝭!(elements["Ωᵛ"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
 i=1/10
@@ -28,24 +40,39 @@ ApproxOperator.prescribe!(elements["Γᵍ"],:n₁₂=>(x,y,z)->0.0)
 ApproxOperator.prescribe!(elements["Γᵍ"],:n₂₂=>(x,y,z)->1.0)
 
 ops = [
-       Operator{:∫κεγds}(:EI=>EI,:EA=>EA,:kGA=>kGA,:R=>R),
+    #    Operator{:∫κεγds}(:EI=>EI,:EA=>EA,:kGA=>kGA,:R=>R),
+       Operator{:∫κMds}(:EI=>EI),
+       Operator{:∫εNds}(:R=>R),
+       Operator{:∫γVds}(:R=>R),
+       Operator{:∫nNds}(:EA=>EA),
+       Operator{:∫vVds}(:kGA=>kGA),
        Operator{:∫vᵢtᵢds}(),
        Operator{:∫vᵢθᵢds}(:α=>1e9*E),
    #     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
    #     Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
 ]
 
-k = zeros(3*nᵤ,3*nᵤ)
-f = zeros(3*nᵤ)
-f[3*nᵤ-1] += P
+kᵏᵏ = zeros(3*nₖ,3*nₖ)
+kᵏⁿ = zeros(3*nₖ,nₙ)
+kᵏᵛ = zeros(3*nₖ,nᵥ)
+kⁿⁿ = zeros(nₙ,nₙ)
+kᵛᵛ = zeros(nᵥ,nᵥ)
+f = zeros(3*nₖ)
+f[3*nₖ-1] += P
 
-ops[1](elements["Ω"],k)
-ops[3](elements["Γᵍ"],k,f)
+ops[1](elements["Ω"],kᵏᵏ)
+ops[2](elements["Ω"],elements["Ωⁿ"],kᵏⁿ)
+ops[3](elements["Ω"],elements["Ωᵛ"],kᵏᵛ)
+ops[4](elements["Ωⁿ"],kⁿⁿ)
+ops[5](elements["Ωᵛ"],kᵛᵛ)
+ops[7](elements["Γᵍ"],kᵏᵏ,f)
 
+k = [kᵏᵏ kᵏⁿ kᵏᵛ;kᵏⁿ' kⁿⁿ zeros(nₙ,nᵥ);kᵏᵛ' zeros(nᵥ,nₙ) kᵛᵛ]
+f = [f;zeros(nₙ);zeros(nᵥ)]
 d = k\f
-d₁ = d[1:3:3*nᵤ]
-d₂ = d[2:3:3*nᵤ]
-d₃ = d[3:3:3*nᵤ]
+d₁ = d[1:3:3*nₖ]
+d₂ = d[2:3:3*nₖ]
+d₃ = d[3:3:3*nₖ]
 
 push!(nodes,:d₁=>d₁,:d₂=>d₂,:d₃=>d₃)
 
@@ -56,15 +83,3 @@ v = π*P*R^3/4/EI+π*P*R/4/kGA+π*P*R/4/EA
 eᵇ = d₁[2]/u
 eˢ = d₂[2]/v
 eᵐ = d₃[2]/θ
-
-index = 100
-XLSX.openxlsx("./xlsx/curved.xlsx", mode="rw") do xf
-    Sheet = xf[2]
-    ind = findfirst(n->n==ndiv,index)+8
-    Sheet["A"*string(ind)] = i
-    Sheet["B"*string(ind)] = eᵇ
-    Sheet["C"*string(ind)] = eˢ
-    Sheet["D"*string(ind)] = eᵐ
-end
-
-θᶠ/θᶜ
