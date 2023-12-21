@@ -21,7 +21,7 @@ set𝝭!(elements["Ωⁿ"])
 set𝝭!(elements["Ωᵛ"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
-i=1/10
+i=1/1000
 R = 1
 h = R*i
 E = 3e6
