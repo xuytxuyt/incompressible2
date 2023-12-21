@@ -2,8 +2,8 @@ using Revise, ApproxOperator, LinearAlgebra, XLSX
 include("input.jl")
 
 ndiv= 30
-ndiv_n= 30
-ndiv_v= 30
+ndiv_n= 28
+ndiv_v= 28
 elements,nodes,nodes_n,nodes_v = import_fem_bar("./msh/bar_"*string(ndiv)*".msh","./msh/bar_"*string(ndiv_n)*".msh","./msh/bar_"*string(ndiv_v)*".msh")
 nₖ = length(nodes)
 nₙ = length(nodes_n)
