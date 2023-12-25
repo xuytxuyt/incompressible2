@@ -1,16 +1,16 @@
 using Revise, ApproxOperator, LinearAlgebra, XLSX
 include("input.jl")
 
-ndiv= 30
-ndiv_n= 28
-ndiv_v= 28
+ndiv= 5
+ndiv_n= 5
+ndiv_v= 5
 elements,nodes,nodes_n,nodes_v = import_fem_bar("./msh/bar_"*string(ndiv)*".msh","./msh/bar_"*string(ndiv_n)*".msh","./msh/bar_"*string(ndiv_v)*".msh")
 nₖ = length(nodes)
 nₙ = length(nodes_n)
 nᵥ = length(nodes_v)
 
-sₙ = 1.5/ndiv_n*ones(nₙ)
-sᵥ = 1.5/ndiv_v*ones(nᵥ)
+sₙ = 1.5*π/2/ndiv_n*ones(nₙ)
+sᵥ = 1.5*π/2/ndiv_v*ones(nᵥ)
 
 push!(nodes_n,:s₁=>sₙ,:s₂=>sₙ,:s₃=>sₙ)
 push!(nodes_v,:s₁=>sᵥ,:s₂=>sᵥ,:s₃=>sᵥ)
@@ -21,7 +21,7 @@ set𝝭!(elements["Ωⁿ"])
 set𝝭!(elements["Ωᵛ"])
 set𝝭!(elements["Γᵍ"])
 set𝝭!(elements["Γᵗ"])
-i=1/1000
+i=1/10
 R = 1
 h = R*i
 E = 3e6
@@ -83,3 +83,13 @@ v = π*P*R^3/4/EI+π*P*R/4/kGA+π*P*R/4/EA
 eᵇ = d₁[2]/u
 eˢ = d₂[2]/v
 eᵐ = d₃[2]/θ
+
+index = 5
+XLSX.openxlsx("./xlsx/curved.xlsx", mode="rw") do xf
+    Sheet = xf[2]
+    ind = findfirst(n->n==ndiv,index)+4
+    Sheet["E"*string(ind)] = ndiv
+    Sheet["F"*string(ind)] = eᵇ
+    Sheet["G"*string(ind)] = eˢ
+    Sheet["H"*string(ind)] = eᵐ
+end
