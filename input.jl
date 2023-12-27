@@ -662,28 +662,21 @@ function cal_area_support(elms::Vector{ApproxOperator.Tri3})
     return s, var𝐴
 end
 
-function import_quad_PP(filename1::String,filename2::String)
-    elms,~ = ApproxOperator.importmsh(filename1)
-    elms_p,~ = ApproxOperator.importmsh(filename2)
+function import_quad_PP(filename::String)
+    elms,~ = ApproxOperator.importmsh(filename)
     nₚ = length(elms["Ω"][1].x)
-    nᵖ = length(elms_p["Ω"][1].x)
     x = elms["Ω"][1].x
     y = elms["Ω"][1].y
     z = elms["Ω"][1].z
-    xᵖ = elms_p["Ω"][1].x
-    yᵖ = elms_p["Ω"][1].y
-    zᵖ = elms_p["Ω"][1].z
 
     data = Dict([:x=>(1,x),:y=>(1,y),:z=>(1,z)])
     nodes = [Node{(:𝐼,),1}((i,),data) for i in 1:nₚ]
-    data_p = Dict([:x=>(1,xᵖ),:y=>(1,yᵖ),:z=>(1,zᵖ)])
-    nodes_p = [Node{(:𝐼,),1}((i,),data_p) for i in 1:nᵖ]
 
     elements = Dict{String,Vector{ApproxOperator.AbstractElement}}()
 
     f_Ω = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI4,data)
     f_Ωᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Quad},:QuadGI16,data)
-    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(PiecewiseParametric{:Constant2D,:Quad},:QuadGI4,data_p)
+    f_Ωᵖ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(PiecewiseParametric{:Constant2D,:Quad},:QuadGI4,data)
     f_Γᵍ = ApproxOperator.Field{(:𝐼,),1,(:𝑔,:𝐺,:𝐶,:𝑠),4}(Element{:Seg2},:SegGI2,data)
 
     elements["Ω"] = f_Ω(elms["Ω"])
@@ -729,5 +722,5 @@ function import_quad_PP(filename1::String,filename2::String)
             ap.n₂ = (x₁-x₂)/𝐿
         end
     end
-    return elements, nodes, nodes_p
+    return elements, nodes
 end
