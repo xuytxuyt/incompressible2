@@ -53,6 +53,7 @@ include("input.jl")
     Operator{:∫vᵢgᵢds}(:α=>1e9*E),
     Operator{:Hₑ_Incompressible}(:E=>E,:ν=>ν),
     Operator{:Hₑ_PlaneStress}(:E=>E,:ν=>ν),
+    Operator{:Hₑ_up_mix}(:E=>Ē,:ν=>ν̄),
     ]
     kᵤᵤ = zeros(2*nᵤ,2*nᵤ)
     kᵤₚ = zeros(2*nᵤ,nₚ)
